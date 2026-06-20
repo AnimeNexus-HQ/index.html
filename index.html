@@ -1,0 +1,319 @@
+        }
+        /* تصميم بطاقة الصياد الأسطورية */
+        .hunter-card {
+            background: linear-gradient(135deg, #2c3e50, #000000);
+            border: 3px solid #34495e;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: right;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            margin-top: 20px;
+        }
+        .hunter-card.rank-S { border-color: #f1c40f; box-shadow: 0 0 25px rgba(241, 196, 15, 0.5); }
+        .hunter-card h2 { margin: 0 0 15px 0; color: #fff; text-align: center; font-size: 1.5rem; letter-spacing: 2px; }
+        .card-body { display: flex; gap: 15px; align-items: center; }
+        .card-photo { width: 100px; height: 130px; border: 2px solid #58a6ff; background-color: #21262d; border-radius: 8px; background-size: cover; background-position: center; }
+        .card-info { flex: 1; font-size: 0.95rem; line-height: 1.6; }
+        .card-info div span { color: #8b949e; }
+        .card-info div strong { color: #fff; }
+        .rank-badge {
+            position: absolute; top: 15px; left: 15px;
+            width: 55px; height: 55px; background-color: #e74c3c;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 1.5rem; font-weight: bold;
+            color: white; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .rank-S .rank-badge { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; text-shadow: 0 0 5px #fff; }
+        .stamp {
+            position: absolute; bottom: 10px; left: 15px;
+            border: 2px dashed #2ecc71; color: #2ecc71;
+            padding: 3px 8px; font-size: 0.75rem; border-radius: 4px;
+            transform: rotate(-15deg); font-weight: bold;
+        }
+        .stamp.guest { border-color: #7f8c8d; color: #7f8c8d; }
+        .option-box {
+            background: #21262d; border: 1px solid var(--border-color);
+            padding: 12px; margin: 8px 0; border-radius: 8px;
+            cursor: pointer; text-align: right; transition: 0.2s;
+        }
+        .option-box:hover { background: #30363d; border-color: #58a6ff; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AnimeNexus-HQ</h1>
+            <p>نظام تسجيل وصناعة رتب صيادي الـ Solo Leveling ⚔️</p>
+        </header>
+
+        <!-- الشاشة 1: اختيار الوضع -->
+        <div id="modeScreen" class="mode-selection">
+            <h3>اختر طريقة إصدار رخصة الصياد الخاصة بك:</h3>
+            <button class="btn" onclick="startMode('exam')">🛡️ دخول اختبار تقييم الرتبة (تحدي الأوتاكو)</button>
+            <button class="btn btn-secondary" onclick="startMode('custom')">📇 تصميم بطاقة فورية يدوياً (بدون اختبار)</button>
+        </div>
+
+        <!-- الشاشة 2: استمارة البيانات المبدئية -->
+        <div id="formScreen" class="setup-form hidden">
+            <h3 id="formTitle">أدخل بيانات السجل المدني للصيادين</h3>
+            <div class="input-group">
+                <label>اسم الصياد:</label>
+                <input type="text" id="hunterName" placeholder="اكتب اسمك هنا...">
+            </div>
+            <div class="input-group">
+                <label>البلد / المقاطعة:</label>
+                <input type="text" id="hunterCountry" placeholder="مثال: سوريا، مصر، السعودية...">
+            </div>
+            <div class="input-group">
+                <label>الصورة الشخصية (من الاستوديو):</label>
+                <input type="file" id="hunterPhoto" accept="image/*">
+            </div>
+            <div id="customFields" class="hidden">
+                <div class="input-group">
+                    <label>الفئة القتالية (Class):</label>
+                    <select id="hunterClass">
+                        <option value="مقاتل (Fighter)">مقاتل (Fighter)</option>
+                        <option value="سفاح (Assassin)">سفاح (Assassin)</option>
+                        <option value="ساحر (Mage)">ساحر (Mage)</option>
+                        <option value="معالج (Healer)">معالج (Healer)</option>
+                        <option value="مستدعي أرواح (Necromancer)">مستدعي أرواح (Necromancer) 👑</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>الرتبة المطلوبة (Rank):</label>
+                    <select id="hunterRank">
+                        <option value="S++">S++ (مستوى وطني)</option>
+                        <option value="S">S</option>
+                        <option value="A+">A+</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="E">E (أضعف صياد)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" id="submitFormBtn" onclick="processForm()">التالي ➡️</button>
+            <button class="btn btn-secondary" onclick="goBack()">رجوع</button>
+        </div>
+
+        <!-- الشاشة 3: واجهة الاختبار العشوائي -->
+        <div id="quizScreen" class="quiz-container hidden">
+            <div style="display:flex; justify-content:space-between; color:#58a6ff; margin-bottom:15px;">
+                <span id="questionNum">السؤال: 1/7</span>
+                <span id="quizScore">الاستحقاق المتوقع: مستقر</span>
+            </div>
+            <h4 id="questionText" style="text-align:right; font-size:1.1rem; margin-bottom:20px;">جاري تحميل السؤال...</h4>
+            <div id="optionsContainer"></div>
+        </div>
+
+        <!-- الشاشة 4: النتيجة وعرض البطاقة الأسطورية -->
+        <div id="resultScreen" class="result-container hidden">
+            <h3 style="color:#2ecc71;">🎉 تم معالجة البيانات بنجاح في النظام!</h3>
+            <p id="feedbackText" style="line-height:1.6; font-size:1.05rem;"></p>
+            
+            <!-- رخصة الصياد الرقمية -->
+            <div id="finalCard" class="hunter-card">
+                <div id="cardRank" class="rank-badge">E</div>
+                <h2>HUNTER LICENSE</h2>
+                <div class="card-body">
+                    <div id="cardPhotoDisplay" class="card-photo"></div>
+                    <div class="card-info">
+                        <div><span>الاسم:</span> <strong id="cardName">--</strong></div>
+                        <div><span>البلد:</span> <strong id="cardCountry">--</strong></div>
+                        <div><span>الفئة:</span> <strong id="cardClass">--</strong></div>
+                        <div><span>الرقم السري:</span> <strong id="cardID">--</strong></div>
+                    </div>
+                </div>
+                <div id="cardStamp" class="stamp">معتمد بالنظام</div>
+            </div>
+
+            <p style="color:#8b949e; font-size:0.85rem; margin-top:15px;">💡 لتثبيت هويتك ومشاركتها مع أصدقائك، قم بـ <strong>أخذ لقطة شاشة (Screenshot)</strong> للبطاقة الآن!</p>
+            <button class="btn" onclick="location.reload()">🔄 خوض تجربة جديدة</button>
+        </div>
+    </div>
+
+    <script>
+        // بنك الأسئلة العشرة (أنمي فقط - بدون حرق مانهوا)
+        const questionPool = [
+            { q: "ما هي أضعف رتبة رسمية للصيادين في عالم Solo Leveling؟", o: ["الرتبة D", "الرتبة E", "الرتبة F", "الرتبة C"], a: 1 },
+            { q: "للبقاء حياً في المعبد المزدوج، ما هو الترتيب الصحيح للوصايا الثلاث أمام تمثال الحاكم؟", o: ["1. طاعة الحاكم، 2. تمجيد الحاكم، 3. إثبات الإيمان", "1. مهاجمة الحاكم، 2. الهروب، 3. التضحية", "1. تمجيد الحاكم، 2. طاعة الحاكم، 3. الدعاء"], a: 0 },
+            { q: "ما هو أول غرض سحري قام سونغ جين وو بشرائه من متجر النظام لإنقاذ حياته من التسمم؟", o: ["ترياق شفاء (Healing Potion)", "جرعة مانا (Mana Potion)", "مفتاح قبو سري"], a: 0 },
+            { q: "ما هي الفئة (Class) السحرية التي منحها النظام لسونغ جين وو في نهاية اختبار تغيير الوظيفة؟", o: ["السفاح (Assassin)", "الفارس الحارس (Guardian)", "مستدعي الأرواح (Necromancer)"], a: 2 },
+            { q: "من هو قائد الغارة الخائن من الرتبة C الذي حاول التخلص من سونغ جين وو ويو جين هو داخل الكهف؟", o: ["هوانغ دونغ-سو", "هوانغ دونغ-سوك", "كانغ تاي-شيك"], a: 1 },
+            { q: "ما هي الأداة التي استخدمها رئيس الجمعية لإعادة قياس طاقة سونغ جين وو والتأكد من رتبته الأسطورية؟", o: ["بلورة زجاجية سحرية لقياس المانا", "جهاز كمبيوتر رقمي مطور", "عداد طاقة محمول"], a: 0 },
+            { q: "ما هي الرتبة الرسمية الممنوحة للصياد الوفي 'يو جين هو' الذي يرافق بطلنا دائماً؟", o: ["الرتبة E", "الرتبة D", "الرتبة C"], a: 1 },
+            { q: "ما هو اسم أول ظل من فئة الفرسان استخرجه سونغ جين وو بنجاح بعد قتال ملحمي؟", o: ["تانك (Tank)", "أيرون (Iron)", "إيغريس (Igris)"], a: 2 },
+            { q: "ما هي رتبة الصياد 'هوانغ دونغ-سو' الغاضب في أمريكا والذي يريد الانتقام لمقتل أخيه؟", o: ["الرتبة S", "الرتبة A+", "مستوى صياد وطني S++"], a: 0 },
+            { q: "ما هو الكائن المرعب ذو الرؤوس الثلاثة الذي واجهه البطل كحارس لبوابة قبو 'قلعة الشيطان'؟", o: ["التنين الكريستالي", "سيربيروس (Cerberus)", "ملك العمالقة"], a: 1 }
+        ];
+
+        let currentMode = '';
+        let selectedQuestions = [];
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let userPhotoData = '';
+
+        // التعامل مع رفع الصورة وتحويلها لرابط محلي داخل المتصفح
+        document.getElementById('hunterPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) { userPhotoData = event.target.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function startMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeScreen').classList.add('hidden');
+            document.getElementById('formScreen').classList.remove('hidden');
+            if(mode === 'custom') {
+                document.getElementById('formTitle').innerText = "قم بصياغة رخصتك المخصصة بنفسك";
+                document.getElementById('customFields').classList.remove('hidden');
+            } else {
+                document.getElementById('formTitle').innerText = "سجل بياناتك قبل دخول اختبار التقييم";
+                document.getElementById('customFields').classList.add('hidden');
+            }
+        }
+
+        function goBack() {
+            document.getElementById('formScreen').classList.add('hidden');
+            document.getElementById('modeScreen').classList.remove('hidden');
+        }
+
+        function processForm() {
+            const name = document.getElementById('hunterName').value.trim();
+            const country = document.getElementById('hunterCountry').value.trim();
+            if(!name || !country) { alert("رجاءً، املأ خانة الاسم والبلد لإصدار السجل!"); return; }
+
+            document.getElementById('formScreen').classList.add('hidden');
+
+            if(currentMode === 'custom') {
+                generateCustomCard();
+            } else {
+                startQuiz();
+            }
+        }
+
+        function generateCustomCard() {
+            const name = document.getElementById('hunterName').value;
+            const country = document.getElementById('hunterCountry').value;
+            const hClass = document.getElementById('hunterClass').value;
+            const rank = document.getElementById('hunterRank').value;
+
+            displayCard(name, country, hClass, rank, "GUEST-" + Math.floor(1000 + Math.random() * 9000), "custom");
+        }
+
+        function startQuiz() {
+            // اختيار 7 أسئلة عشوائية من أصل 10 بدون تكرار
+            let shuffled = [...questionPool].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 7);
+            currentQuestionIdx = 0;
+            score = 0;
+            document.getElementById('quizScreen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if(currentQuestionIdx >= selectedQuestions.length) {
+                evaluateQuizResults();
+                return;
+            }
+            document.getElementById('questionNum').innerText = `السؤال: ${currentQuestionIdx + 1}/7`;
+            const qData = selectedQuestions[currentQuestionIdx];
+            document.getElementById('questionText').innerText = qData.q;
+            
+            const optionsDiv = document.getElementById('optionsContainer');
+            optionsDiv.innerHTML = '';
+            
+            qData.o.forEach((opt, idx) => {
+                const box = document.createElement('div');
+                box.className = 'option-box';
+                box.innerText = opt;
+                box.onclick = () => handleAnswer(idx);
+                optionsDiv.appendChild(box);
+            });
+        }
+
+        function handleAnswer(selectedIdx) {
+            if(selectedIdx === selectedQuestions[currentQuestionIdx].a) { score++; }
+            currentQuestionIdx++;
+            showQuestion();
+        }
+
+        function evaluateQuizResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            const name = document.getElementById('hunterName').value;
+            const country = document.getElementById('hunterCountry').value;
+            
+            let rank = 'E';
+            let hClass = 'مقاتل (Fighter)';
+            
+            // احتساب الرتبة بناءً على عدد الإجابات الصحيحة في النظام الصارم
+            if(score === 7) { rank = 'S++'; hClass = 'مستدعي أرواح (Necromancer) 👑'; }
+            else if(score === 6) { rank = 'S'; hClass = 'سفاح (Assassin)'; }
+            else if(score === 5) { rank = 'A+'; hClass = 'ساحر (Mage)'; }
+            else if(score === 4) { rank = 'B'; hClass = 'مقاتل (Fighter)'; }
+            else if(score === 3) { rank = 'C'; hClass = 'معالج (Healer)'; }
+            else if(score === 2) { rank = 'D'; hClass = 'مقاتل (Fighter)'; }
+            else { rank = 'E'; hClass = 'صياد مبتدئ'; }
+
+            displayCard(name, country, hClass, rank, "EXAM-" + Math.floor(1000 + Math.random() * 9000), "exam");
+        }
+
+        function displayCard(name, country, hClass, rank, id, type) {
+            document.getElementById('resultScreen').classList.remove('hidden');
+            
+            document.getElementById('cardName').innerText = name;
+            document.getElementById('cardCountry').innerText = country;
+            document.getElementById('cardClass').innerText = hClass;
+            document.getElementById('cardID').innerText = id;
+            document.getElementById('cardRank').innerText = rank;
+
+            const cardElement = document.getElementById('finalCard');
+            const stampElement = document.getElementById('cardStamp');
+            
+            // تطبيق الميزات البصرية حسب النوع والرتبة
+            if(rank.includes('S')) {
+                cardElement.className = 'hunter-card rank-S';
+            } else {
+                cardElement.className = 'hunter-card';
+            }
+
+            if(type === 'custom') {
+                stampElement.innerText = "بطاقة هواة مخصصة";
+                stampElement.className = "stamp guest";
+                document.getElementById('feedbackText').innerHTML = `أهلاً بك يا صياد <strong>${name}</strong>. لقد قمت بتصميم بطاقتك الشخصية بنجاح وفقاً لتفضيلاتك الخاصة!`;
+            } else {
+                stampElement.innerText = "صياد معتمد بالنظام";
+                stampElement.className = "stamp";
+                
+                let feedback = '';
+                if(score >= 6) {
+                    feedback = `👑 <strong>مبهر!!</strong> لقد جاوبت على ${score} أسئلة صحيحة وتجاوزت حدود البشر. النظام يعلن الصياد <strong>${name}</strong> رسمياً برتبة أسطورية! جنود الظلال الآن تنحني لك..`;
+                } else if(score >= 4) {
+                    feedback = `⚡ <strong>أداء جيد جداً!</strong> إجاباتك الصحيحة (${score}/7) جعلتك قوة لا يستهان بها في الغارات المتقدمة، لكن طموحك يجب أن يلامس السماء. تدرب أكثر ونظف البوابات القادمة!`;
+                } else {
+                    feedback = `⚠️ <strong>لا بأس يا مقتحم الصعاب!</strong> تذكر أن الصياد 'سونغ جين وو' نفسه بدأ من الرتبة E كأضعف صياد في البشرية. نراكم مرة أخرى بعد أن تتدربوا جيداً في غارات الأقبية! ⚔️`;
+                }
+                document.getElementById('feedbackText').innerHTML = feedback;
+            }
+
+            // وضع الصورة الشخصية المرفوعة
+            const photoDiv = document.getElementById('cardPhotoDisplay');
+            if(userPhotoData) {
+                photoDiv.style.backgroundImage = `url('${userPhotoData}')`;
+            } else {
+                photoDiv.style.backgroundImage = "none";
+                photoDiv.innerText = "📸 بدون صورة";
+                photoDiv.style.display = "flex";
+                photoDiv.style.alignItems = "center";
+                photoDiv.style.justifyContent = "center";
+                photoDiv.style.fontSize = "0.75rem";
+            }
+        }
+    </script>
+</body>
+</html>
